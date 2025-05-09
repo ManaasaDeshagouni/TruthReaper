@@ -1,197 +1,153 @@
-# 🔍 TruthReaper
+# TruthReaper – Real-Time Deception Detection from Speech and Text
 
-## 💡 Project Overview
-TruthReaper is an AI-powered real-time voice-based **lie and stress detection system** that analyzes human speech for hesitation, disfluency, and behavioral patterns. It is designed to assist in scenarios like virtual interrogations, mock interviews, or psychological research by identifying potential indicators of deception and emotional tension.
-
-The system uses:
-- 🎙️ Live or pre-recorded voice input
-- 🤖 Whisper (offline, Hugging Face version) for transcription
-- 🧠 Custom logic to auto-label speakers as [OFFICER] or [ACCUSED]
-- ⏱️ Pause-based auto-stopping during real-time recording
+**Authors:**  
+- Manasa Deshagouni  
+- Dheeraj Kumar Alla  
+**Institution:** San Jose State University  
+**Course:** CS286 – Advanced Topics in Computer Science  
+**Project Type:** Final Research Submission
 
 ---
 
-## ✅ Current Features
+## 📌 Overview
 
-### 🎧 Dual Mode Transcriber
-Choose between:
-1. **Real-Time Recording**: Record voice using mic (max 2 minutes), stops automatically after 15s of silence
-2. **Pre-Recorded Audio**: Use your `.wav` file (interviews, conversations, etc.)
-
-### 📝 Whisper Transcription
-- Fully offline transcription using Hugging Face’s `whisper-base`
-- Automatically resamples any input audio to 16kHz
-
-### 🗣 Speaker Labeling
-- Automatically tags each sentence as:
-  - `[OFFICER]` if it ends with a `?`
-  - `[ACCUSED]` otherwise
-- Saves output as `recordings/marked_transcript.txt`
-
-### 🔇 Silence Detection (Real-Time Mode)
-- Records up to 2 mins OR
-- Stops early if there's **15 seconds of silence**
+TruthReaper is a **dual-track deception detection system** designed to classify spoken statements as **truthful** or **deceptive**. The system leverages both acoustic and semantic signals from speech through two complementary machine learning pipelines:
 
 ---
 
-## 🗂 Project Structure
-```
+### 🔁 Track 1 – Hybrid LSTM (Manasa)
+
+- Extracts **sequential time-series features** from `.wav` audio:
+  - `pitch_seq`, `energy_seq`, `hesitation_seq`, `disfluency_seq`
+- Computes 12 **summary features** like:
+  - pause duration, disfluency rate, pitch variance, etc.
+- Combines both using a **Bidirectional LSTM**
+- Trains using **weighted cross-entropy**
+- Augments training data using a **conditional GAN**
+- Supports **real-time voice-based prediction** via microphone + Whisper
+
+
+
+---
+
+## 📊 Evaluation
+
+- **Dataset**: Real-Life Trial (RLT) + self-recorded `.wav` clips
+- **Cross-validation**: 5-Fold
+- **Track 1** – LSTM:
+  - F1 Score: **0.798**, Accuracy: 80.4%
+
+---
+
+## 🗂 Folder Structure
 TruthReaper/
-├── audio_processor.py                # Original prototype (kept for backup)
-├── truth_reaper_transcriber.py       # 🔥 Dual-mode transcriber with auto-tagging
-├── models/
-│   └── whisper-base/                 # Hugging Face Whisper model files
-├── recordings/
-│   ├── realtime.wav                  # Recorded real-time input
-│   ├── interview1.wav               # Sample input (optional)
-│   └── marked_transcript.txt        # Final output transcript
-├── env/                              # Virtual environment (add to .gitignore)
-├── requirements.txt                 # Required packages
-└── README.md
-```
+├── analysis/                       # Stores evaluation plots and prediction reports
+├── clips/                          # Place your raw .wav data here (truthful, deception folders)
+├── env/ / venv/                    # Virtual environment folders (optional)
+├── models/                         # Whisper + saved model weights
+├── recordings/                     # Real-time recorded clips (auto-created)
+├── *.py                            # All training, inference, and feature scripts
+├── *.json                          # Processed datasets and synthetic data
+├── README.md                       # Project guide (this file)
+├── requirements.txt                # Dependency list
 
 ---
 
-## 🛠️ Installation & Setup
+## 📦 File Descriptions
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/your-username/TruthReaper.git
-cd TruthReaper
-```
+### 🔄 Feature Extraction
+- `batch_feature_extractor.py` – Main extractor for all audio features (sequential + summary)
+- `pause_anlyzer.py` – Identifies hesitation/pause segments in speech
+- `disfluency_extractor.py` – Uses Whisper transcription to find fillers, stutters, repetitions
+- `emotion_analyzer.py` – Extracts average energy and pitch variance for emotion cues
+- `audio_processor.py` / `feature_extractor.py` – Older feature modules (optional)
 
-### 2. Set up virtual environment (optional but recommended)
-```bash
-python3 -m venv env
-source env/bin/activate
-```
+---
 
-### 3. Install dependencies
+### 🤖 Modeling & Training
+- `sequence_lstm_trainer.py` – Base LSTM model trainer
+- `k_fold_trainer.py` – Performs 5-fold cross-validation and saves results
+- `truthreaper_hybrid_lstm.pt` – Final trained BiLSTM model
+
+---
+
+### 🧪 Synthetic Data
+- `gan_trainer.py` – Trains a GAN for synthetic time-series generation
+- `gan_generator.py` – Internal generator class
+- `generator_truth.pt`, `generator_lie.pt` – Trained GAN models
+- `synthetic_full_truth.json`, `synthetic_full_lie.json` – GAN-generated sample datasets
+- `merge_datasets.py` – Combines real and synthetic samples into one JSON
+
+---
+
+### 🎤 Inference & Real-Time
+- `truth_reaper_transcriber.py` – Record audio + transcribe + predict (full pipeline)
+- `truth_recorder.py`, `lie_recorder.py` – Save mic input directly to respective folders
+- `test-input-01.txt` – Test transcripts for evaluation
+- `video_to_audio_converter.py` – Extracts audio from video files for labeling
+
+---
+
+## 📦 Installation
+
+Create a virtual environment (optional) and install dependencies:
+
 ```bash
 pip install -r requirements.txt
-```
 
-### 4. Download Whisper Base Model from Hugging Face
-Go to: https://huggingface.co/openai/whisper-base/tree/main  
-Place the following files in `models/whisper-base/`:
-- config.json
-- merges.txt
-- preprocessor_config.json
-- pytorch_model.bin
-- tokenizer.json
-- vocab.json
+📂 Dataset Setup
 
----
+🔺 The dataset is not provided in this repo. You must download it manually.
 
-## 🚀 How to Run the Project
+	1.	Download from:
+https://archive.ics.uci.edu/ml/datasets/Real+Life+Trial+Dataset
+	2.	Place your .wav files in this structure:
+  /clips/
+├── truthful/
+│   ├── trial_truth_001.wav
+│   └── ...
+└── deception/
+    ├── trial_lie_001.wav
+    └── ...
 
-### 1. Run the main tool
-```bash
+🚀 How to Run the Project
+
+✅ 1. Feature Extraction:
+python3 batch_feature_extractor.py --limit 100
+
+✔️ Generates sequence_dataset.json with audio features
+
+✅ 2. (Optional) Generate Synthetic Data:
+python3 gan_trainer.py --label truth --epochs 5000
+python3 gan_trainer.py --label lie --epochs 5000
+
+then merge them:
+python3 merge_datasets.py
+✔️ Creates sequence_dataset_combined.json
+
+✅ 3. Train the LSTM Model (Track 1):
+python3 k_fold_trainer.py
+
+✔️ Performs 5-fold CV
+✔️ Saves truthreaper_hybrid_lstm.pt
+✔️ Saves evaluation plot as kfold_metrics.png
+
+✅ 4. Real-Time Prediction (Microphone)
 python3 truth_reaper_transcriber.py
-```
 
-### 2. Choose mode
-```
-[1] Real-Time Live Recording (max 2 mins, stops if 15s silence)
-[2] Use Pre-Recorded Interview Audio
-```
+	•	Records your voice
+	•	Predicts “truth” or “lie”
+	•	Logs to /analysis/reports/
 
-### 3. Output
-You’ll get a clear, labeled transcription in:
-```
-recordings/marked_transcript.txt
-```
+❗ Notes
+	•	Whisper ASR is downloaded automatically via Huggingface (whisper-base)
+	•	Project assumes single-speaker English voice recordings
 
----
+📚 References
+	•	Whisper: https://github.com/openai/whisper
+	•	RLT Dataset: https://archive.ics.uci.edu/ml/datasets/Real+Life+Trial+Dataset
+	•	Librosa: https://librosa.org
 
-## 🧪 What’s Next (To Be Developed)
-- `pause_analyzer.py`: Analyze silent gaps, hesitation patterns
-- `emotion_detector.py`: Extract pitch, tone, and stress markers using Librosa
-- `lie_predictor.py`: Combine behavioral and audio features to predict deception (Random Forest → LSTM → Transformer upgrade)
-- Web Interface (Flask/Streamlit) for cleaner UX
+🙏 Acknowledgments
 
----
-
-## 🙋 Team Handoff Notes
-- Everything is modular, commented, and extensible
-- Use real voice input for best results
-- Model accuracy will improve with clean, controlled input
-- Avoid background noise in live testing
-
-Feel free to contact the current lead (Manasa) for guidance or merge approvals 😎
-
----
-
-## ⚠️ Setup Notes & Common Pitfalls
-> These issues were faced during development. Follow these tips to avoid them:
-
-### 🔁 Python Version Compatibility
-- Use **Python 3.10 or 3.9**
-- Avoid Python 3.12 (some packages like `pyaudio` or Whisper’s dependencies break)
-
-### 🎙 PyAudio Installation Issues
-- If `pyaudio` fails:
-  ```bash
-  brew install portaudio
-  pip install pyaudio
-  ```
-- On Linux:
-  ```bash
-  sudo apt install portaudio19-dev python3-pyaudio
-  ```
-
-### 🔇 Whisper Transcription Problems
-- Avoid using `tiny` model — it's not accurate
-- Use `whisper-base` from Hugging Face
-- If you get:
-  ```
-  ValueError: You have explicitly specified forced_decoder_ids
-  ```
-  then add this line **right after loading the model**:
-  ```python
-  model.config.forced_decoder_ids = None
-  model.config.suppress_tokens = []
-  ```
-
-### 📉 Sample Rate Errors (44100 vs 16000)
-- If Whisper throws:
-  ```
-  sampling rate must be 16000
-  ```
-  that means your mic/audio file is at 44100 Hz.
-- This is already handled with `torchaudio.transforms.Resample()` in the code.
-
-### 🔐 SSL Errors on Whisper Download
-- If model download fails with SSL cert errors:
-  - Use a **VPN**
-  - OR **download the model manually** from Hugging Face:
-    https://huggingface.co/openai/whisper-base/tree/main
-
-### 📦 Required Python Packages
-Make sure `requirements.txt` includes:
-```txt
-transformers
-torch
-torchaudio
-pyaudio
-librosa
-audioop
-```
-Then install:
-```bash
-pip install -r requirements.txt
-```
-
-✅ If anything breaks — ping the last committer. They went through hell so you don’t have to 🙃
-
----
-
-## ✨ Built with
-- 🤖 [Hugging Face Transformers](https://huggingface.co/transformers/)
-- 🔊 [Torchaudio](https://pytorch.org/audio/)
-- 🎧 [PyAudio](https://people.csail.mit.edu/hubert/pyaudio/)
-- ❤️ Collaboration, fire, and vision
-
----
-
-Let’s build AI that doesn’t just hear you — it **reads your truth.** 😈🖤
+We thank Prof. Amith Kamath Belman for valuable feedback and research guidance, and acknowledge the use of OpenAI Whisper and Huggingface Transformers in this project.
