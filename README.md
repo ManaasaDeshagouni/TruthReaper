@@ -15,7 +15,16 @@ TruthReaper is a **dual-track deception detection system** designed to classify 
 
 ---
 
-### 🔁 Track 1 – Hybrid LSTM (Manasa)
+### 🔁 Track 2 – Multimodal Fusion Approach 
+Steps to Run the project 
+
+install requirements.txt 
+go to disfluency_prosody folder
+cd to scripts in the folder 
+write this  command in the terminal
+
+python predict.py
+### 🔁 Track 1 – Hybrid LSTM
 
 - Extracts **sequential time-series features** from `.wav` audio:
   - `pitch_seq`, `energy_seq`, `hesitation_seq`, `disfluency_seq`
