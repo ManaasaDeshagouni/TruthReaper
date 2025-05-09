@@ -15,7 +15,18 @@ TruthReaper is a **dual-track deception detection system** designed to classify 
 
 ---
 
-### 🔁 Track 1 – Hybrid LSTM (Manasa)
+
+
+### 🔁 Track 1 – Multimodal Fusion Approach 
+Steps to Run the project 
+
+install requirements.txt 
+go to disfluency_prosody folder
+cd to scripts in the folder 
+write this  command in the terminal
+
+python predict.py
+### 🔁 Track 2 – Hybrid LSTM
 
 - Extracts **sequential time-series features** from `.wav` audio:
   - `pitch_seq`, `energy_seq`, `hesitation_seq`, `disfluency_seq`
@@ -26,16 +37,6 @@ TruthReaper is a **dual-track deception detection system** designed to classify 
 - Augments training data using a **conditional GAN**
 - Supports **real-time voice-based prediction** via microphone + Whisper
 
-
-
----
-
-## 📊 Evaluation
-
-- **Dataset**: Real-Life Trial (RLT) + self-recorded `.wav` clips
-- **Cross-validation**: 5-Fold
-- **Track 1** – LSTM:
-  - F1 Score: **0.798**, Accuracy: 80.4%
 
 ---
 
@@ -79,6 +80,7 @@ TruthReaper/
 - `merge_datasets.py` – Combines real and synthetic samples into one JSON
 
 ---
+
 
 ### 🎤 Inference & Real-Time
 - `truth_reaper_transcriber.py` – Record audio + transcribe + predict (full pipeline)
@@ -150,4 +152,6 @@ python3 truth_reaper_transcriber.py
 
 🙏 Acknowledgments
 
+
 We thank Prof. Amith Kamath Belman for valuable feedback and research guidance, and acknowledge the use of OpenAI Whisper and Huggingface Transformers in this project.
+
