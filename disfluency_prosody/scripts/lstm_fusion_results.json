@@ -1,0 +1,5 @@
+{
+    "model": "XGBOOST AND DistilBert(Fusion)",
+    "accuracy": 0.6198347107438017,
+    "f1": 0.676056338028169
+}
